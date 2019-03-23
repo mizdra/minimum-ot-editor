@@ -7,9 +7,15 @@ CFLAGS = $(CWFLAGS) -std=gnu11 -g -I src
 SRCDIR := ./src
 OBJDIR := ./obj
 BINDIR := ./bin
-SRCS   := $(shell find $(SRCDIR)/{common,ot,editor} -name *.c)
-OBJS   := $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-DEPS := $(OBJS:%.o=%.d)
+
+LIB_SRCS   := $(shell find $(SRCDIR)/{common,ot,editor} -name *.c)
+LIB_OBJS   := $(LIB_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+LIB_DEPS   := $(LIB_OBJS:%.o=%.d)
+
+BIN_SRCS   := $(shell find $(SRCDIR)/bin -name *.c)
+BIN_OBJS   := $(BIN_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+BIN_DEPS   := $(BIN_OBJS:%.o=%.d)
+
 
 .PHONY: all clean generate
 
@@ -18,8 +24,8 @@ all: server client
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 
-generate: server client
-	sed -e '1s/^/[/' -e '$$s/,$$/]/' obj/**/*.o.json > compile_commands.json
+generate: $(LIB_OBJS) $(BIN_OBJS)
+	sed -e '1s/^/[/' -e '$$s/,$$/]/' $(OBJDIR)/**/*.o.json > compile_commands.json
 
 # 実行可能ファイル以外の全てをコンパイル
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
@@ -27,13 +33,13 @@ $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	$(CC) $(CFLAGS) -c -MJ $@.json -MMD $< -o $@
 
 # 実行可能ファイルをコンパイル
-server: $(SRCDIR)/bin/server.c $(OBJS)
+server: $(OBJDIR)/bin/server.o $(LIB_OBJS)
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 
-client: $(SRCDIR)/bin/client.c $(OBJS)
+client: $(OBJDIR)/bin/client.o $(LIB_OBJS)
 	mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 
 # .d から依存関係を読み込む
--include $(DEPS)
+-include $(LIB_DEPS) $(BIN_DEPS)
