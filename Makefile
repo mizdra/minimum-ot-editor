@@ -11,17 +11,20 @@ SRCS   := $(shell find $(SRCDIR)/{common,ot,editor} -name *.c)
 OBJS   := $(SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 DEPS := $(OBJS:%.o=%.d)
 
-.PHONY: all clean
+.PHONY: all clean generate
 
 all: server client
 
 clean:
 	rm -rf $(OBJDIR) $(BINDIR)
 
+generate: server client
+	sed -e '1s/^/[/' -e '$$s/,$$/]/' obj/**/*.o.json > compile_commands.json
+
 # 実行可能ファイル以外の全てをコンパイル
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
-	$(CC) $(CFLAGS) -c -MMD $< -o $@
+	mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -MJ $@.json -MMD $< -o $@
 
 # 実行可能ファイルをコンパイル
 server: $(SRCDIR)/bin/server.c $(OBJS)
