@@ -8,13 +8,13 @@ SRCDIR := ./src
 OBJDIR := ./obj
 BINDIR := ./bin
 
-LIB_SRCS   := $(shell find $(SRCDIR)/{common,ot,editor} -name *.c)
-LIB_OBJS   := $(LIB_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-LIB_DEPS   := $(LIB_OBJS:%.o=%.d)
+LIB_SRCS := $(shell find $(SRCDIR) -name '*.c' -not -iwholename '$(SRCDIR)/bin/*')
+LIB_OBJS := $(LIB_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+LIB_DEPS := $(LIB_OBJS:%.o=%.d)
 
-BIN_SRCS   := $(shell find $(SRCDIR)/bin -name *.c)
-BIN_OBJS   := $(BIN_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
-BIN_DEPS   := $(BIN_OBJS:%.o=%.d)
+BIN_SRCS := $(shell find $(SRCDIR)/bin -name '*.c')
+BIN_OBJS := $(BIN_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+BIN_DEPS := $(BIN_OBJS:%.o=%.d)
 
 
 .PHONY: all clean generate
