@@ -1,4 +1,4 @@
-# ot-editor
+# minimum-ot-editor
 
 A minimum editor implemented with [Operational Transformation](https://operational-transformation.github.io).
 
