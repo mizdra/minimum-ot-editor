@@ -29,16 +29,16 @@ generate: $(LIB_OBJS) $(BIN_OBJS)
 
 # 実行可能ファイル以外の全てをコンパイル
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
-	mkdir -p $(dir $@)
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -MJ $@.json -MMD $< -o $@
 
 # 実行可能ファイルをコンパイル
 server: $(OBJDIR)/bin/server.o $(LIB_OBJS)
-	mkdir -p $(BINDIR)
+	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 
 client: $(OBJDIR)/bin/client.o $(LIB_OBJS)
-	mkdir -p $(BINDIR)
+	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 
 # .d から依存関係を読み込む
