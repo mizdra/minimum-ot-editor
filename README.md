@@ -7,22 +7,25 @@ A minimum editor implemented with [Operational Transformation](https://operation
 ## Features
 
 - Editor
-  - [x] ASCII
-  - [ ] Unicode
-  - [x] Line break
-  - [x] Word wrap
-  - [x] Move by arrow keys
-  - [x] Beep alert for invalid operation (ex: Move cursor out of range)
-  - [x] Cursor position highlight of yours
-  - [ ] Cursor position highlight of other clients
-  - [ ] Copy/Paste
+  - :white_check_mark: Line break
+  - :white_check_mark: Word wrap
+  - :white_check_mark: Move by arrow keys
+  - :white_check_mark: Beep alert for invalid operation (ex: Move cursor out of range)
+  - :white_check_mark: Cursor position highlight of yours
+  - :heavy_multiplication_x: Cursor position highlight of other clients
+  - :heavy_multiplication_x: Copy/Paste
 - Operational Transformation
-  - [x] Multiple client connections
-  - [ ] Insert single charactor (ex: Insert `'c'` by pressing C key)
-  - [x] Delete single charactor
-  - [ ] Insert multiple charactors (ex: Insert `"str"` by pasting)
-  - [ ] Delete multiple charactors
-  - [ ] Undo/Redo
+  - :white_check_mark: Insert single charactor (ex: Insert `'c'` by pressing C key)
+  - :heavy_multiplication_x: Insert multiple charactors (ex: Insert `"str"` by pasting)
+  - :white_check_mark: Delete single charactor
+  - :heavy_multiplication_x: Delete multiple charactors
+  - :heavy_multiplication_x: Undo/Redo
+- Characters
+  - :white_check_mark: ASCII
+  - :heavy_multiplication_x: Unicode
+- Network
+  - :white_check_mark: Multiple client connections
+  - :heavy_multiplication_x: Connection reestablishment
 
 ## Usage
 
