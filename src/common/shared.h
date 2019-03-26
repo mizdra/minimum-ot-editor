@@ -5,5 +5,6 @@
 #define MAX_ACTION_SIZE 1000
 
 int min(int a, int b);
+void panic(char *s);
 
 #endif  // common_shared_h

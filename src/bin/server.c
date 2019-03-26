@@ -4,6 +4,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "common/cli.h"
 #include "ot/server.h"
 #include "ot/transform.h"
 
@@ -52,14 +53,17 @@ int apply_action_to_server(char *document, ACTION action) {
   return 1;
 }
 
-int main() {
+int main(int argc, char **argv) {
   int sockfd;
   struct sockaddr_in sin, cli;
   socklen_t clilen;
   fd_set fds, client_fds;
   int fd;
-
   clilen = sizeof(cli);
+
+  bzero((char *)&sin, sizeof(sin));
+  sin.sin_family = PF_INET;
+  parse_args(argc, argv, &sin.sin_addr.s_addr, &sin.sin_port);
 
   sockfd = socket(PF_INET, SOCK_STREAM, 0);
   if (sockfd < 0) {
@@ -67,10 +71,6 @@ int main() {
     exit(1);
   }
 
-  bzero((char *)&sin, sizeof(sin));
-  sin.sin_family = PF_INET;
-  sin.sin_addr.s_addr = htonl(INADDR_ANY);
-  sin.sin_port = htons(SERVER_PORT);
   if (bind(sockfd, (struct sockaddr *)&sin, sizeof(sin)) < 0) {
     fprintf(stderr, "fail to bind\n");
     exit(1);

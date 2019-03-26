@@ -5,6 +5,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "common/cli.h"
 #include "editor/init.h"
 #include "editor/input.h"
 #include "editor/render.h"
@@ -140,14 +141,13 @@ int service(int fd, EDITOR *editor) {
   return 1;
 }
 
-void panic(char *s) {
-  perror(s);
-  exit(1);
-}
-
-int main() {
+int main(int argc, char **argv) {
   int sockfd;
   struct sockaddr_in sin;
+
+  bzero((char *)&sin, sizeof(sin));
+  sin.sin_family = PF_INET;
+  parse_args(argc, argv, &sin.sin_addr.s_addr, &sin.sin_port);
 
   EDITOR editor;
 
@@ -155,11 +155,6 @@ int main() {
 
   if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) /* socket */
     panic("cannot create socket");
-
-  bzero((char *)&sin, sizeof(sin));
-  sin.sin_family = PF_INET;
-  sin.sin_addr.s_addr = inet_addr(SERVER_ADDR);
-  sin.sin_port = htons(SERVER_PORT);
 
   if (connect(sockfd, (struct sockaddr *)&sin, sizeof(sin)) < 0)
     panic("cannot connect");

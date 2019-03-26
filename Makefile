@@ -1,7 +1,7 @@
 CC = clang
 # C標準と矛盾する拡張機能の使用をエラーにする
 # ref: https://qnighy.hatenablog.com/entry/2015/09/26/192104
-CWFLAGS = -Wall -Wextra -Werror -pedantic-errors
+CWFLAGS = -Wall -Wextra -Werror -pedantic-errors -Wno-pragma-once-outside-header
 CFLAGS = $(CWFLAGS) -std=gnu11 -g -I src
 
 SRCDIR := ./src
