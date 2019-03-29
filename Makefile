@@ -8,11 +8,11 @@ SRCDIR := ./src
 OBJDIR := ./obj
 BINDIR := ./bin
 
-LIB_SRCS := $(shell find $(SRCDIR) -name '*.c' -not -iwholename '$(SRCDIR)/bin/*')
-LIB_OBJS := $(LIB_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
+LIB_SRCS := $(shell find $(SRCDIR) -name '*.h')
+LIB_OBJS := $(LIB_SRCS:$(SRCDIR)/%.h=$(OBJDIR)/%.o)
 LIB_DEPS := $(LIB_OBJS:%.o=%.d)
 
-BIN_SRCS := $(shell find $(SRCDIR)/bin -name '*.c')
+BIN_SRCS := $(shell find $(SRCDIR) -name '*.c')
 BIN_OBJS := $(BIN_SRCS:$(SRCDIR)/%.c=$(OBJDIR)/%.o)
 BIN_DEPS := $(BIN_OBJS:%.o=%.d)
 
@@ -28,16 +28,20 @@ generate: $(LIB_OBJS) $(BIN_OBJS)
 	sed -e '1s/^/[/' -e '$$s/,$$/]/' $(OBJDIR)/**/*.o.json > compile_commands.json
 
 # 実行可能ファイル以外の全てをコンパイル
+$(OBJDIR)/%.o: $(SRCDIR)/%.h
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -c -MJ $@.json -MMD $< -o $@
+
 $(OBJDIR)/%.o: $(SRCDIR)/%.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c -MJ $@.json -MMD $< -o $@
 
 # 実行可能ファイルをコンパイル
-server: $(OBJDIR)/bin/server.o $(LIB_OBJS)
+server: $(OBJDIR)/bin/server.o
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 
-client: $(OBJDIR)/bin/client.o $(LIB_OBJS)
+client: $(OBJDIR)/bin/client.o
 	@mkdir -p $(BINDIR)
 	$(CC) $(CFLAGS) $^ -o $(BINDIR)/$@
 

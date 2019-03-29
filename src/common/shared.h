@@ -1,10 +1,14 @@
-#ifndef common_shared_h
-#define common_shared_h
+#pragma once
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #define MAX_DOCUMENT_SIZE 1024
 #define MAX_ACTION_SIZE 1000
 
-int min(int a, int b);
-void panic(char *s);
+int min(int a, int b) { return a > b ? b : a; }
 
-#endif  // common_shared_h
+void panic(char *s) {
+  perror(s);
+  exit(1);
+}

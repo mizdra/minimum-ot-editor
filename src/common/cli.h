@@ -1,9 +1,12 @@
 #pragma once
 
 #include <arpa/inet.h>
+#include <stdlib.h>
 
-// コマンドライン引数をパースする.
-// 引数は以下の形式で渡される.
-// ./server <addr> <port>
-// ./client <addr> <port>
-void parse_args(int argc, char** argv, in_addr_t* addr, in_port_t* port);
+#include "common/shared.h"
+
+void parse_args(int argc, char** argv, in_addr_t* addr, in_port_t* port) {
+  if (argc != 3) panic("command line arguments are missing.");
+  *addr = inet_addr(argv[1]);
+  *port = htons(atoi(argv[2]));
+}

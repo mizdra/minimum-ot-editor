@@ -29,13 +29,12 @@
 // - エディタはターミナル上に実装される.
 //   - 入力は標準入力を, 出力は標準出力を利用する.
 
-#ifndef editor__init_h
-#define editor__init_h
+#pragma once
 
 #include <termios.h>
+#include <unistd.h>
 
 #define MAX_DOCUMENT_SIZE 1024
-
 #define DELETE_KEY 127
 
 // ASCIIコード領域 (0 ~ 127) と被らないよう,
@@ -55,9 +54,19 @@ typedef struct {
 } EDITOR;
 
 // エコーの無効化や非カノニカルモードの有効化などのエディタの初期化を行う.
-void init_editor(EDITOR *editor);
+void init_editor(EDITOR *editor) {
+  tcgetattr(STDIN_FILENO, &editor->term);
+  // エディタ終了時に termios を元に戻すため, バックアップを取っておく
+  editor->term_bak = editor->term;
+  editor->term.c_lflag &= ~ECHO;    // エコーの無効化
+  editor->term.c_lflag &= ~ICANON;  // 非カノニカルモードの有効化
+  tcsetattr(STDIN_FILENO, TCSANOW, &editor->term);
+
+  editor->cursor = 0;
+  editor->document[0] = '\0';
+}
 
 // エコーなどの termios の状態を元に戻し, エディタを終了する
-void exit_editor(EDITOR *editor);
-
-#endif  // editor__init_h
+void exit_editor(EDITOR *editor) {
+  tcsetattr(STDIN_FILENO, TCSANOW, &editor->term_bak);
+}
