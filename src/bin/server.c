@@ -13,7 +13,8 @@
 void disconnect(fd_set *fds, fd_set *client_fds, int fd) {
   FD_CLR(fd, fds);
   FD_CLR(fd, client_fds);
-  if (shutdown(fd, SHUT_RDWR) < 0) panic_with_errno();
+  // すでに切断されている場合 (ENOTCONN) は panic しない
+  if (shutdown(fd, SHUT_RDWR) < 0 && errno != ENOTCONN) panic_with_errno();
   if (close(fd) < 0) panic_with_errno();
 }
 
