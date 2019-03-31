@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "common/shared.h"
+#include "common/util.h"
 #include "editor/window.h"
 
 // n + 1 番目の文字の上にカーソルを移動する (Zero-based index).

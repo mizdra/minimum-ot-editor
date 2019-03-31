@@ -8,11 +8,6 @@
 #include "ot/server.h"
 #include "ot/transform.h"
 
-#define SERVER_ADDR "127.0.0.1"
-#define STUDENT_ID 241
-#define PORT_BASE 12000
-#define SERVER_PORT (PORT_BASE + STUDENT_ID)
-
 // 共同編集するドキュメント
 char document[MAX_DOCUMENT_SIZE] = "Hello!";
 

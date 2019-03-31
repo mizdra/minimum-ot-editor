@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "common/shared.h"
+#include "common/util.h"
 #include "ot/operation.h"
 #include "ot/transform.h"
 

@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <sys/select.h>
 
-#include "common/shared.h"
+#include "common/util.h"
 #include "ot/operation.h"
 #include "ot/transform.h"
 
