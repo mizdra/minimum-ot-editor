@@ -21,6 +21,12 @@ void print_err(const char *format, ...) {
   va_end(va);
 }
 
+void print_err_with_errno() {
+  fprintf(stderr, "\033[0;31m");  // set red color
+  perror("error");                // print error message with errno
+  fprintf(stderr, "\033[0m\n");   // reset color
+}
+
 void panic_with_errno() {
   fprintf(stderr, "\033[0;31m");  // set red color
   perror("error");                // print error message with errno

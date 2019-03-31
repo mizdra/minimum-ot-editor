@@ -5,7 +5,7 @@
 #include <strings.h>
 #include <unistd.h>
 
-#include "common/cli.h"
+#include "common/network.h"
 #include "editor/init.h"
 #include "editor/input.h"
 #include "editor/render.h"
@@ -113,10 +113,8 @@ int service(int fd, EDITOR *editor) {
 
   while (1) {
     fd_set result_fds = fds;  // select の結果を書き込むための fd_set を用意する
-    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0) {
-      print_err("fail to select");
-      return 0;
-    }
+    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0)
+      panic_with_errno();
 
     // 標準入力から入力があったら handle_stdin を,
     // サーバから入力があったら handle_server を呼ぶ
@@ -129,38 +127,30 @@ int service(int fd, EDITOR *editor) {
           "#################### handle_server ####################\n");  // デバッグ用
       if (!handle_server(fd, &client, editor, editor->my_client_id)) return 0;
     } else {
-      print_err("impossible branch");
-      return 0;
+      panic("impossible branch");
     }
   }
   return 1;
 }
 
+int easy_connect(struct sockaddr_in *sin) {
+  int sockfd = socket(PF_INET, SOCK_STREAM, 0);
+  if (sockfd < 0) panic_with_errno();
+  if (connect(sockfd, (struct sockaddr *)sin, sizeof(*sin)) < 0)
+    panic_with_errno();
+  return sockfd;
+}
+
 int main(int argc, char **argv) {
-  int sockfd;
   struct sockaddr_in sin;
-
-  bzero((char *)&sin, sizeof(sin));
-  sin.sin_family = PF_INET;
-  parse_args(argc, argv, &sin.sin_addr.s_addr, &sin.sin_port);
-
+  init_sockaddr_in_by_args(argc, argv, &sin);
+  int sockfd = easy_connect(&sin);
   EDITOR editor;
-
   init_editor(&editor);
 
-  if ((sockfd = socket(PF_INET, SOCK_STREAM, 0)) < 0) /* socket */
-    panic("cannot create socket");
-
-  if (connect(sockfd, (struct sockaddr *)&sin, sizeof(sin)) < 0)
-    panic("cannot connect");
-
-  if (!service(sockfd, &editor)) {
-    panic("client error");
-  }
-
-  if (shutdown(sockfd, SHUT_RDWR) < 0) panic("cannot shutdown");
-  close(sockfd);
-
+  if (!service(sockfd, &editor)) panic("client error");
+  if (shutdown(sockfd, SHUT_RDWR) < 0) panic_with_errno();
+  if (close(sockfd) < 0) panic_with_errno();
   exit_editor(&editor);
 
   return 0;
