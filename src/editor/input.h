@@ -16,7 +16,7 @@ int scan_key() {
 
   // Control Sequence Introducer でなければエラーを出力し, リトライする
   if (fgetc(stdin) != '[') {
-    fprintf(stderr, "unrecognized key\n");
+    print_err("unrecognized key");
     scan_key();
   }
 
@@ -32,7 +32,7 @@ int scan_key() {
   }
 
   // サポートしていないキーはエラーを出力し, リトライする
-  fprintf(stderr, "unrecognized key\n");
+  print_err("unrecognized key");
   scan_key();
   return 0;
 }

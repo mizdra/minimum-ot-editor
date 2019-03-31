@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "common/util.h"
 #include "ot/operation.h"
 
 // ##############################
@@ -55,17 +56,17 @@ OP_PAIR xform(OP a, OP b) {
     return pair_init(pair.right, pair.left);
   }
 
-  fprintf(stderr, "Unknown operation type. ((a.type, b.type) == (%d, %d))\n",
-          a.type, b.type);
+  print_err("Unknown operation type. ((a.type, b.type) == (%d, %d))", a.type,
+            b.type);
   exit(1);
 }
 
 ACTION_PAIR xform_action(ACTION a, ACTION b) {
   if (a.rev != b.rev) {
-    fprintf(stderr,
-            "Actions with different revisions can not be merged. ((a.rev, "
-            "b.rev) == (%d, %d))\n",
-            a.rev, b.rev);
+    print_err(
+        "Actions with different revisions can not be merged. ((a.rev, "
+        "b.rev) == (%d, %d))",
+        a.rev, b.rev);
     exit(1);
   }
   OP_PAIR op_pair = xform(a.op, b.op);

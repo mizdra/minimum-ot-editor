@@ -75,19 +75,19 @@ int handle_server(int fd, CLIENT *client, EDITOR *editor, int my_client_id) {
 int on_connect(int fd, int *my_client_id, int *rev, char *document) {
   // サーバから割り振られたクライアントごとのidを受け取る
   if (read(fd, my_client_id, sizeof(int)) <= 0) {
-    fprintf(stderr, "fail to receive my_client_id from server\n");
+    print_err("fail to receive my_client_id from server");
     return 0;
   }
 
   // サーバからドキュメントのリビジョンを受け取る
   if (read(fd, rev, sizeof(int)) <= 0) {
-    fprintf(stderr, "fail to receive revision from server\n");
+    print_err("fail to receive revision from server");
     return 0;
   }
 
   // サーバからドキュメントを受け取る
   if (read(fd, document, MAX_DOCUMENT_SIZE) <= 0) {
-    fprintf(stderr, "fail to receive document from server\n");
+    print_err("fail to receive document from server");
     return 0;
   }
 
@@ -114,7 +114,7 @@ int service(int fd, EDITOR *editor) {
   while (1) {
     fd_set result_fds = fds;  // select の結果を書き込むための fd_set を用意する
     if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0) {
-      fprintf(stderr, "fail to select\n");
+      print_err("fail to select");
       return 0;
     }
 
@@ -129,7 +129,7 @@ int service(int fd, EDITOR *editor) {
           "#################### handle_server ####################\n");  // デバッグ用
       if (!handle_server(fd, &client, editor, editor->my_client_id)) return 0;
     } else {
-      fprintf(stderr, "impossible branch\n");
+      print_err("impossible branch");
       return 0;
     }
   }
@@ -155,7 +155,7 @@ int main(int argc, char **argv) {
     panic("cannot connect");
 
   if (!service(sockfd, &editor)) {
-    fprintf(stderr, "client error\n");
+    panic("client error");
   }
 
   if (shutdown(sockfd, SHUT_RDWR) < 0) panic("cannot shutdown");

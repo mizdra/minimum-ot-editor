@@ -10,7 +10,7 @@
 // 移動に成功したら真を, 失敗したら偽を返す.
 int cursor_move_by_index(EDITOR* editor, int n) {
   if (n < 0) {
-    fprintf(stderr, "n is too small: n = %d\n", n);
+    print_err("cursor index must be 0 or above: (n = %d)", n);
     return 0;
   }
 
@@ -26,13 +26,11 @@ int cursor_move_by_index(EDITOR* editor, int n) {
 // 移動に成功したら真を, 失敗したら偽を返す.
 int cursor_move_by_position(EDITOR* editor, int row, int column) {
   if (row < 1 || column < 1) {  // row が小さすぎる場合
-    fprintf(stderr, "row is too small: (row, column) = (%d, %d)\n", row,
-            column);
+    print_err("row is too small: (row, column) = (%d, %d)", row, column);
     return 0;
   }
   if (column < 1) {  // column が小さすぎる場合
-    fprintf(stderr, "column is too small: (row, column) = (%d, %d)\n", row,
-            column);
+    print_err("column is too small: (row, column) = (%d, %d)", row, column);
     return 0;
   }
 
@@ -41,15 +39,13 @@ int cursor_move_by_position(EDITOR* editor, int row, int column) {
   while (r < row) {
     row_head = get_head_of_next_row(editor, row_head);
     if (!row_head) {  // row が大きすぎる場合
-      fprintf(stderr, "row is too big: (row, column) = (%d, %d)\n", row,
-              column);
+      print_err("row is too big: (row, column) = (%d, %d)", row, column);
       return 0;
     }
     r++;
   }
   if (column > get_column_count(editor, row)) {  // column が大きすぎる場合
-    fprintf(stderr, "column is too big: (row, column) = (%d, %d)\n", row,
-            column);
+    print_err("column is too big: (row, column) = (%d, %d)", row, column);
     return 0;
   }
   int new_cursor = row_head + column - 1;
