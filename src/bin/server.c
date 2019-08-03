@@ -14,8 +14,9 @@ void disconnect(fd_set *fds, fd_set *client_fds, int fd) {
   FD_CLR(fd, fds);
   FD_CLR(fd, client_fds);
   // すでに切断されている場合 (ENOTCONN) は panic しない
-  if (shutdown(fd, SHUT_RDWR) < 0 && errno != ENOTCONN) panic_with_errno();
-  if (close(fd) < 0) panic_with_errno();
+  if (shutdown(fd, SHUT_RDWR) < 0 && errno != ENOTCONN)
+    PANIC("fail to shutdown client(%d) socket", fd);
+  if (close(fd) < 0) PANIC("fail to close client(%d) socket", fd);
 }
 
 // アクションをサーバのドキュメントに適用する
@@ -29,10 +30,10 @@ int apply_action_to_server(char *document, ACTION action) {
 
 int easy_listen(struct sockaddr_in *sin) {
   int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) panic_with_errno();
+  if (sockfd < 0) PANIC("fail to `socket`");
   if (bind(sockfd, (struct sockaddr *)sin, sizeof(*sin)) < 0)
-    panic_with_errno();
-  if (listen(sockfd, 5) < 0) panic_with_errno();
+    PANIC("fail to `bind`");
+  if (listen(sockfd, 5) < 0) PANIC("fail to `listen`");
   return sockfd;
 }
 
@@ -82,7 +83,7 @@ bool handle_action(int client_fd, __attribute__((unused)) fd_set *client_fds,
 
   // 操作変換したアクションを適用
   if (!apply_action_to_server(context->document, action))
-    panic("fail to apply_action_to_server");
+    PANIC("fail to apply_action_to_server");
 
   printf("update revision: rev=%d, doc=%s\n", context->server.rev,
          context->document);  // デバッグ用
@@ -98,7 +99,7 @@ void handle_clients(int sockfd, CONTEXT *context) {
   while (1) {
     fd_set result_fds = fds;
     if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0)
-      panic_with_errno();
+      PANIC("fail to `select`");
     usleep(500000);  // 遅延のある環境を再現するために 0.3 秒 sleep する
 
     for (int fd = 0; fd < FD_SETSIZE; fd++) {

@@ -111,7 +111,7 @@ int service(int fd, EDITOR *editor) {
   while (1) {
     fd_set result_fds = fds;  // select の結果を書き込むための fd_set を用意する
     if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0)
-      panic_with_errno();
+      PANIC("fail to `select`");
 
     // 標準入力から入力があったら handle_stdin を,
     // サーバから入力があったら handle_server を呼ぶ
@@ -124,7 +124,7 @@ int service(int fd, EDITOR *editor) {
           "#################### handle_server ####################\n");  // デバッグ用
       if (!handle_server(fd, &client, editor, editor->my_client_id)) return 0;
     } else {
-      panic("impossible branch");
+      PANIC("impossible branch");
     }
   }
   return 1;
@@ -132,9 +132,9 @@ int service(int fd, EDITOR *editor) {
 
 int easy_connect(struct sockaddr_in *sin) {
   int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) panic_with_errno();
+  if (sockfd < 0) PANIC("fail to `socket`");
   if (connect(sockfd, (struct sockaddr *)sin, sizeof(*sin)) < 0)
-    panic_with_errno();
+    PANIC("fail to `connect`");
   return sockfd;
 }
 
@@ -145,9 +145,9 @@ int main(int argc, char **argv) {
   EDITOR editor;
   init_editor(&editor);
 
-  if (!service(sockfd, &editor)) panic("client error");
-  if (shutdown(sockfd, SHUT_RDWR) < 0) panic_with_errno();
-  if (close(sockfd) < 0) panic_with_errno();
+  if (!service(sockfd, &editor)) PANIC("client error");
+  if (shutdown(sockfd, SHUT_RDWR) < 0) PANIC("fail to shutdown socket");
+  if (close(sockfd) < 0) PANIC("fail to close socket");
   exit_editor(&editor);
 
   return 0;

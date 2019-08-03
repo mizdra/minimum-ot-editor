@@ -9,6 +9,11 @@
 #define MAX_DOCUMENT_SIZE 1024
 #define MAX_ACTION_SIZE 1000
 
+#define PANIC(fmt, ...)                                                     \
+  {                                                                         \
+    err_msg(__FILE__, __FUNCTION__, __LINE__, "panic", fmt, ##__VA_ARGS__); \
+    exit(EXIT_FAILURE);                                                     \
+  }
 #define ERROR(fmt, ...) \
   err_msg(__FILE__, __FUNCTION__, __LINE__, "error", fmt, ##__VA_ARGS__)
 #define WARNING(fmt, ...) \
@@ -42,22 +47,4 @@ void err_msg(const char *file, const char *function, int line, const char *type,
   fprintf(stderr, " = errno: %s(%d)", strerror(errno),
           errno);       // print errno
   fputc('\n', stderr);  // new line
-}
-
-void panic_with_errno() {
-  fprintf(stderr, "\033[0;31m");  // set red color
-  perror("error");                // print error message with errno
-  fprintf(stderr, "\033[0m\n");   // reset color
-  exit(EXIT_FAILURE);
-}
-
-void panic(const char *format, ...) {
-  va_list va;
-  va_start(va, format);
-  fprintf(stderr, "\033[0;31m");  // set red color
-  fprintf(stderr, "error: ");     // print header
-  vfprintf(stderr, format, va);   // print error message
-  fprintf(stderr, "\033[0m\n");   // reset color
-  va_end(va);
-  exit(EXIT_FAILURE);
 }
