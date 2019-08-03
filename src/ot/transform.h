@@ -56,14 +56,14 @@ OP_PAIR xform(OP a, OP b) {
     return pair_init(pair.right, pair.left);
   }
 
-  print_err("Unknown operation type. ((a.type, b.type) == (%d, %d))", a.type,
-            b.type);
+  ERROR("Unknown operation type. ((a.type, b.type) == (%d, %d))", a.type,
+        b.type);
   exit(1);
 }
 
 ACTION_PAIR xform_action(ACTION a, ACTION b) {
   if (a.rev != b.rev) {
-    print_err(
+    ERROR(
         "Actions with different revisions can not be merged. ((a.rev, "
         "b.rev) == (%d, %d))",
         a.rev, b.rev);

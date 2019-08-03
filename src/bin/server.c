@@ -21,7 +21,7 @@ void disconnect(fd_set *fds, fd_set *client_fds, int fd) {
 // アクションをサーバのドキュメントに適用する
 int apply_action_to_server(char *document, ACTION action) {
   if (!apply_op(document, action.op)) {
-    print_err("fail to apply_op");
+    ERROR("fail to apply operation");
     return 0;
   }
   return 1;
@@ -48,15 +48,15 @@ typedef struct {
 bool handle_connect(int client_fd, __attribute__((unused)) fd_set *client_fds,
                     CONTEXT *context) {
   if (write(client_fd, &client_fd, sizeof(int)) < 0) {
-    print_err_with_errno();
+    ERROR("fail to send `client_fd`");
     return false;
   }
   if (write(client_fd, &context->server.rev, sizeof(int)) < 0) {
-    print_err_with_errno();
+    ERROR("fail to send revision");
     return false;
   }
   if (write(client_fd, context->document, MAX_DOCUMENT_SIZE) < 0) {
-    print_err_with_errno();
+    ERROR("fail to send document");
     return false;
   }
   printf("send document = %s\n", context->document);
@@ -71,7 +71,7 @@ bool handle_action(int client_fd, __attribute__((unused)) fd_set *client_fds,
   ACTION action;
   if (!recv_action_from_client(&context->server, client_fds, client_fd,
                                &action)) {
-    print_err("fail to recv_action_from_client: client_fd = %d\n", client_fd);
+    ERROR("fail to recv_action_from_client: client_fd = %d\n", client_fd);
     return false;
   }
 
@@ -111,7 +111,7 @@ void handle_clients(int sockfd, CONTEXT *context) {
         // クライアントの接続情報は使わないので, 第2/3引数にはNULLを渡す
         int client_fd = accept(sockfd, NULL, NULL);
         if (client_fd < 0) {
-          print_err_with_errno();
+          ERROR("fail to accept");
           continue;
         }
         printf("Accetpted new connection: fd = %d\n", client_fd);  // デバッグ用

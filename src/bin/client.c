@@ -26,14 +26,15 @@ int handle_stdin(int fd, CLIENT *client, EDITOR *editor) {
   // 操作に対応するアクションを生成し, サーバに送信する
   ACTION action = action_init(editor->my_client_id, client->rev, op);
   if (!send_action_to_server(client, fd, action)) {
-    fprintf(stderr, "fail to send action: ");
-    print_action(action);
-    fprintf(stderr, "\n");
+    ERROR("fail to send action");
     return 0;
   }
 
   // 送信が完了したらローカルのドキュメントにアクションを適用する
-  if (!apply_action_to_client(editor, action)) return 0;
+  if (!apply_action_to_client(editor, action)) {
+    ERROR("fail to apply action");
+    return 0;
+  }
 
   return 1;
 }
@@ -47,9 +48,7 @@ int handle_server(int fd, CLIENT *client, EDITOR *editor, int my_client_id) {
   // アクションをサーバから受信し, 操作変換したものを action に格納する
   ACTION action;
   if (!recv_action_from_server(client, fd, my_client_id, &action)) {
-    fprintf(stderr, "fail to receive action: ");
-    print_action(action);
-    fprintf(stderr, "\n");
+    ERROR("fail to receive action");
     return 0;
   }
 
@@ -60,9 +59,7 @@ int handle_server(int fd, CLIENT *client, EDITOR *editor, int my_client_id) {
 
   // 操作変換したアクションを適用
   if (!apply_action_to_client(editor, action)) {
-    fprintf(stderr, "fail to apply action: ");
-    print_action(action);
-    fprintf(stderr, "\n");
+    ERROR("fail to apply action");
     return 0;
   }
 
@@ -75,19 +72,19 @@ int handle_server(int fd, CLIENT *client, EDITOR *editor, int my_client_id) {
 int on_connect(int fd, int *my_client_id, int *rev, char *document) {
   // サーバから割り振られたクライアントごとのidを受け取る
   if (read(fd, my_client_id, sizeof(int)) <= 0) {
-    print_err("fail to receive my_client_id from server");
+    ERROR("fail to receive my_client_id from server");
     return 0;
   }
 
   // サーバからドキュメントのリビジョンを受け取る
   if (read(fd, rev, sizeof(int)) <= 0) {
-    print_err("fail to receive revision from server");
+    ERROR("fail to receive revision from server");
     return 0;
   }
 
   // サーバからドキュメントを受け取る
   if (read(fd, document, MAX_DOCUMENT_SIZE) <= 0) {
-    print_err("fail to receive document from server");
+    ERROR("fail to receive document from server");
     return 0;
   }
 

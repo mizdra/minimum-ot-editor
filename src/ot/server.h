@@ -20,7 +20,7 @@ void server_init(SERVER *server, int rev) { server->rev = rev; }
 int reduce_action(SERVER *server, ACTION action, ACTION *action_dash) {
   // アクションがサーバに存在しないリビジョンを起点としていた場合, エラー
   if (action.rev < 0 || server->rev < action.rev) {
-    print_err(
+    ERROR(
         "operation revision not in history: (action.rev, server->rev) = "
         "(%d, %d)",
         action.rev, server->rev);
@@ -48,7 +48,7 @@ void broadcast_action_to_clients(fd_set *client_fds, ACTION action) {
     if (!FD_ISSET(fd, client_fds))
       continue;  // fdに対応するクライアントがなければスキップ
     if (!write_action(fd, action)) {
-      print_err("WARNING: fail to send action to client: client_id=%d", fd);
+      ERROR("WARNING: fail to send action to client: client_id=%d", fd);
     }
   }
 }
@@ -59,12 +59,12 @@ int recv_action_from_client(SERVER *server, fd_set *client_fds, int client_fd,
                             ACTION *action) {
   ACTION received_action;
   if (!read_action(client_fd, &received_action)) {
-    print_err("fail to read_action");
+    ERROR("fail to read_action");
     return 0;
   }
 
   if (!reduce_action(server, received_action, action)) {
-    print_err("fail to reduce_action");
+    ERROR("fail to reduce_action");
     return 0;
   }
 

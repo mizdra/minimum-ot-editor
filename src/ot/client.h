@@ -73,7 +73,7 @@ int recv_action_from_server(CLIENT *client, int fd, int my_client_id,
   // 本来は受信した action が不正なものでないかチェックする必要があるが,
   // 今回は必ず適用可能な形へと変換できる action が受信されると仮定する
   if (!read_action(fd, &received_action)) {
-    print_err("fail to read_action");
+    ERROR("fail to read_action");
     return 0;
   }
 
@@ -88,7 +88,7 @@ int recv_action_from_server(CLIENT *client, int fd, int my_client_id,
       // それをサーバに送信する
       ACTION buffered_action = shift_action_from_buffer(client);
       if (!write_action(fd, buffered_action)) {
-        print_err("fail to write_action");
+        ERROR("fail to write_action");
         return 0;
       }
       client->outstanding = buffered_action;
