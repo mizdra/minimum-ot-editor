@@ -3,7 +3,6 @@
 #include <errno.h>
 #include <stdarg.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <string.h>
 
 #define MAX_DOCUMENT_SIZE 1024
@@ -27,23 +26,23 @@ int min(int a, int b) { return a > b ? b : a; }
 
 void err_msg(const char *file, const char *function, int line, const char *type,
              const char *fmt, ...) {
-  fprintf(stderr, RED);           // set color
-  fprintf(stderr, "%s: ", type);  // print type
-
-  // print message
+  // print error message
+  fprintf(stderr, RED);
+  fprintf(stderr, "%s: ", type);
   va_list va;
   va_start(va, fmt);
-  vfprintf(stderr, fmt, va);  // fmtの書式に従って可変個数引数を順次呼び出す
+  vfprintf(stderr, fmt, va);
   va_end(va);
+  fprintf(stderr, RESET_COLOR);
+  fputc('\n', stderr);
 
-  fprintf(stderr, RESET_COLOR);  // reset color
-  fputc('\n', stderr);           // new line
+  // print error source
+  fprintf(stderr, BOLD);
+  fprintf(stderr, " --> `%s` (%s:%d)", function, file, line);
+  fprintf(stderr, RESET_COLOR);
+  fputc('\n', stderr);
 
-  fprintf(stderr, BOLD);                                       // set color
-  fprintf(stderr, " --> `%s` (%s:%d)", function, file, line);  // print location
-  fprintf(stderr, RESET_COLOR);                                // reset color
-  fputc('\n', stderr);                                         // new line
-
+  // print errno
   if (errno != 0) {
     fprintf(stderr, " = errno: %s(%d)", strerror(errno),
             errno);       // print errno
