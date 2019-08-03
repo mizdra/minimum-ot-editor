@@ -71,7 +71,7 @@ bool handle_action(int client_fd, __attribute__((unused)) fd_set *client_fds,
   ACTION action;
   if (!recv_action_from_client(&context->server, client_fds, client_fd,
                                &action)) {
-    ERROR("fail to recv_action_from_client: client_fd = %d\n", client_fd);
+    ERROR("fail to recv_action_from_client: client_fd = %d", client_fd);
     return false;
   }
 
