@@ -44,7 +44,10 @@ void err_msg(const char *file, const char *function, int line, const char *type,
   fprintf(stderr, RESET_COLOR);                                // reset color
   fputc('\n', stderr);                                         // new line
 
-  fprintf(stderr, " = errno: %s(%d)", strerror(errno),
-          errno);       // print errno
-  fputc('\n', stderr);  // new line
+  if (errno != 0) {
+    fprintf(stderr, " = errno: %s(%d)", strerror(errno),
+            errno);       // print errno
+    fputc('\n', stderr);  // new line
+    errno = 0;
+  }
 }
