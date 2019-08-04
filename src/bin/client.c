@@ -110,7 +110,7 @@ int service(int fd, EDITOR *editor) {
 
   while (1) {
     fd_set result_fds = fds;  // select の結果を書き込むための fd_set を用意する
-    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0)
+    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) == -1)
       PANIC("fail to `select`");
 
     // 標準入力から入力があったら handle_stdin を,
@@ -132,8 +132,8 @@ int service(int fd, EDITOR *editor) {
 
 int easy_connect(struct sockaddr_in *sin) {
   int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) PANIC("fail to `socket`");
-  if (connect(sockfd, (struct sockaddr *)sin, sizeof(*sin)) < 0)
+  if (sockfd == -1) PANIC("fail to `socket`");
+  if (connect(sockfd, (struct sockaddr *)sin, sizeof(*sin)) == -1)
     PANIC("fail to `connect`");
   return sockfd;
 }
@@ -146,8 +146,8 @@ int main(int argc, char **argv) {
   init_editor(&editor);
 
   if (!service(sockfd, &editor)) PANIC("client error");
-  if (shutdown(sockfd, SHUT_RDWR) < 0) PANIC("fail to shutdown socket");
-  if (close(sockfd) < 0) PANIC("fail to close socket");
+  if (shutdown(sockfd, SHUT_RDWR) == -1) PANIC("fail to shutdown socket");
+  if (close(sockfd) == -1) PANIC("fail to close socket");
   exit_editor(&editor);
 
   return 0;

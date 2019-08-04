@@ -15,9 +15,9 @@ void init_sockaddr_in_by_args(int argc, char** argv, struct sockaddr_in* in) {
 
 int bind_and_listen(struct sockaddr_in* sin) {
   int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) PANIC("fail to `socket`");
-  if (bind(sockfd, (struct sockaddr*)sin, sizeof(*sin)) < 0)
+  if (sockfd == -1) PANIC("fail to `socket`");
+  if (bind(sockfd, (struct sockaddr*)sin, sizeof(*sin)) == -1)
     PANIC("fail to `bind`");
-  if (listen(sockfd, 5) < 0) PANIC("fail to `listen`");
+  if (listen(sockfd, 5) == -1) PANIC("fail to `listen`");
   return sockfd;
 }

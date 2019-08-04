@@ -14,9 +14,9 @@ void disconnect(fd_set *fds, fd_set *client_fds, int fd) {
   FD_CLR(fd, fds);
   FD_CLR(fd, client_fds);
   // すでに切断されている場合 (ENOTCONN) は panic しない
-  if (shutdown(fd, SHUT_RDWR) < 0 && errno != ENOTCONN)
+  if (shutdown(fd, SHUT_RDWR) == -1 && errno != ENOTCONN)
     PANIC("fail to shutdown client(%d) socket", fd);
-  if (close(fd) < 0) PANIC("fail to close client(%d) socket", fd);
+  if (close(fd) == -1) PANIC("fail to close client(%d) socket", fd);
 }
 
 // アクションをサーバのドキュメントに適用する
@@ -30,10 +30,10 @@ int apply_action_to_server(char *document, ACTION action) {
 
 int easy_listen(struct sockaddr_in *sin) {
   int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd < 0) PANIC("fail to `socket`");
-  if (bind(sockfd, (struct sockaddr *)sin, sizeof(*sin)) < 0)
+  if (sockfd == -1) PANIC("fail to `socket`");
+  if (bind(sockfd, (struct sockaddr *)sin, sizeof(*sin)) == -1)
     PANIC("fail to `bind`");
-  if (listen(sockfd, 5) < 0) PANIC("fail to `listen`");
+  if (listen(sockfd, 5) == -1) PANIC("fail to `listen`");
   return sockfd;
 }
 
@@ -48,15 +48,15 @@ typedef struct {
 // インスタンスを初期化するための情報を送信する.
 bool handle_connect(int client_fd, __attribute__((unused)) fd_set *client_fds,
                     CONTEXT *context) {
-  if (write(client_fd, &client_fd, sizeof(int)) < 0) {
+  if (write(client_fd, &client_fd, sizeof(int)) == -1) {
     ERROR("fail to send `client_fd`");
     return false;
   }
-  if (write(client_fd, &context->server.rev, sizeof(int)) < 0) {
+  if (write(client_fd, &context->server.rev, sizeof(int)) == -1) {
     ERROR("fail to send revision");
     return false;
   }
-  if (write(client_fd, context->document, MAX_DOCUMENT_SIZE) < 0) {
+  if (write(client_fd, context->document, MAX_DOCUMENT_SIZE) == -1) {
     ERROR("fail to send document");
     return false;
   }
@@ -98,7 +98,7 @@ void handle_clients(int sockfd, CONTEXT *context) {
 
   while (1) {
     fd_set result_fds = fds;
-    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) < 0)
+    if (select(FD_SETSIZE, &result_fds, NULL, NULL, NULL) == -1)
       PANIC("fail to `select`");
     usleep(500000);  // 遅延のある環境を再現するために 0.3 秒 sleep する
 
@@ -111,7 +111,7 @@ void handle_clients(int sockfd, CONTEXT *context) {
                sockfd);  // デバッグ用
         // クライアントの接続情報は使わないので, 第2/3引数にはNULLを渡す
         int client_fd = accept(sockfd, NULL, NULL);
-        if (client_fd < 0) {
+        if (client_fd == -1) {
           ERROR("fail to accept");
           continue;
         }

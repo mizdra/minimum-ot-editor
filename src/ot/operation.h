@@ -96,9 +96,9 @@ int read_action(int fd, ACTION *action) {
 }
 
 int write_action(int fd, ACTION action) {
-  if (write(fd, &action.operator, sizeof(int)) < 0) return 0;
-  if (write(fd, &action.rev, sizeof(int)) < 0) return 0;
-  if (write(fd, &action.op, sizeof(OP)) < 0) return 0;
+  if (write(fd, &action.operator, sizeof(int)) == -1) return 0;
+  if (write(fd, &action.rev, sizeof(int)) == -1) return 0;
+  if (write(fd, &action.op, sizeof(OP)) == -1) return 0;
 
   // デバッグ用
   printf("send action: ");
