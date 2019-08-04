@@ -28,15 +28,6 @@ int apply_action_to_server(char *document, ACTION action) {
   return 1;
 }
 
-int easy_listen(struct sockaddr_in *sin) {
-  int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1) PANIC("fail to `socket`");
-  if (bind(sockfd, (struct sockaddr *)sin, sizeof(*sin)) == -1)
-    PANIC("fail to `bind`");
-  if (listen(sockfd, 5) == -1) PANIC("fail to `listen`");
-  return sockfd;
-}
-
 // handle_connect, handle_action に渡されるアプリケーションに関する情報
 typedef struct {
   SERVER server;
@@ -137,7 +128,7 @@ int main(int argc, char **argv) {
   // listen する
   struct sockaddr_in sin;
   init_sockaddr_in_by_args(argc, argv, &sin);
-  int sockfd = easy_listen(&sin);
+  int sockfd = bind_and_listen(&sin);
 
   // context を作成
   SERVER server;
