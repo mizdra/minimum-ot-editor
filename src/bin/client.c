@@ -5,6 +5,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "common/cli.h"
 #include "common/network.h"
 #include "editor/init.h"
 #include "editor/input.h"
@@ -130,18 +131,13 @@ int service(int fd, EDITOR *editor) {
   return 1;
 }
 
-int easy_connect(struct sockaddr_in *sin) {
-  int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1) PANIC("fail to `socket`");
-  if (connect(sockfd, (struct sockaddr *)sin, sizeof(*sin)) == -1)
-    PANIC("fail to `connect`");
-  return sockfd;
-}
-
 int main(int argc, char **argv) {
-  struct sockaddr_in sin;
-  init_sockaddr_in_by_args(argc, argv, &sin);
-  int sockfd = easy_connect(&sin);
+  char host[20];
+  int port;
+
+  parse_args(argc, argv, host, &port);
+
+  int sockfd = socket_connect(host, port);
   EDITOR editor;
   init_editor(&editor);
 
