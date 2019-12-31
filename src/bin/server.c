@@ -5,6 +5,7 @@
 #include <strings.h>
 #include <unistd.h>
 
+#include "common/cli.h"
 #include "common/network.h"
 #include "ot/server.h"
 #include "ot/transform.h"
@@ -26,15 +27,6 @@ int apply_action_to_server(char *document, ACTION action) {
     return 0;
   }
   return 1;
-}
-
-int easy_listen(struct sockaddr_in *sin) {
-  int sockfd = socket(PF_INET, SOCK_STREAM, 0);
-  if (sockfd == -1) PANIC("fail to `socket`");
-  if (bind(sockfd, (struct sockaddr *)sin, sizeof(*sin)) == -1)
-    PANIC("fail to `bind`");
-  if (listen(sockfd, 5) == -1) PANIC("fail to `listen`");
-  return sockfd;
 }
 
 // handle_connect, handle_action に渡されるアプリケーションに関する情報
@@ -134,10 +126,11 @@ void handle_clients(int sockfd, CONTEXT *context) {
 }
 
 int main(int argc, char **argv) {
-  // listen する
-  struct sockaddr_in sin;
-  init_sockaddr_in_by_args(argc, argv, &sin);
-  int sockfd = easy_listen(&sin);
+  char host[20];
+  int port;
+  parse_args(argc, argv, host, &port);
+
+  int sockfd = socket_listen(host, port);
 
   // context を作成
   SERVER server;
