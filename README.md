@@ -2,7 +2,7 @@
 
 A minimum editor implemented with [Operational Transformation](https://operational-transformation.github.io).
 
-![Preview Image](#)
+- Preview: [Youtube](https://www.youtube.com/watch?v=xDPGVx-9nC0)
 
 ## Features
 
